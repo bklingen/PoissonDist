@@ -1,3 +1,5 @@
+library(plotly)
+
 #  (C) 2016  Bernhard Klingenberg
 shinyUI(
   fluidPage(
@@ -10,13 +12,13 @@ shinyUI(
                "the constant rate of the events happening, provided that the events",
                "happen independently of the time since the last event."),
       conditionalPanel(condition="input.mytabs=='EU'",
-                       # slider to get input for sample size
+                       # slider to get input for lambda
                        wellPanel(
-                         sliderInput(inputId ="sampleSize0",
+                         sliderInput(inputId ="lambda",
                                      label = HTML("<p>Choose &lambda;:</p>"),
                                      min = 1,
-                                     value = 6,
-                                     max = 200,
+                                     max = 10,
+                                     value = 5,
                                      step = 1
                          )
                        )
@@ -41,7 +43,7 @@ shinyUI(
         tabPanel(title="Explore",
                  value="EU",
                  br(),
-                 plotOutput("histo"),
+                 plotlyOutput("histo"),
                  br(),
                  htmlOutput("freqtable")
         ),
