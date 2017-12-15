@@ -1,16 +1,20 @@
 library(plotly)
+library(rhandsontable)
+library(shinyjs)
 
 #  (C) 2016  Bernhard Klingenberg
 shinyUI(
   fluidPage(
+    useShinyjs(),
+    extendShinyjs(script = "../js/focus.js"),
     # Application title
     titlePanel("The Poisson Distribution"),
     # Sidebar with a slider input for number of observations
     sidebarPanel(
-      helpText("The Poisson distribution gives probability of some number of events",
-               "happening within a fixed period of time or interval of space given",
-               "the constant rate of the events happening, provided that the events",
-               "happen independently of the time since the last event."),
+      helpText("The Poisson distribution gives the probability of some events happening",
+               "within a fixed period of time or interval of space given the constant",
+               "rate of the events happening", HTML("(&lambda;)"), "provided that the",
+               "events happen independently of the time since the last event."),
       conditionalPanel(condition="input.mytabs=='EU'",
                        # slider to get input for lambda
                        wellPanel(
@@ -28,9 +32,9 @@ shinyUI(
       h5(tags$b("Options:")),
       checkboxInput("xzoom", "Zoom in on x-axis", value=FALSE),
       conditionalPanel(condition="input.xzoom", 
-                       sliderInput("xrange", "Select range of x-axis:", min=0, max=6, value=c(0,6), round=TRUE)
+                       sliderInput("xrange", "Select range of x-axis:", min=0, max=20, value=c(0,20), round=TRUE)
       ),
-      checkboxInput("probtable", "Show table of probabilities", value=FALSE),
+      checkboxInput("probtable", "Show table of probabilities", value=TRUE),
       #),
       downloadButton("save", "Download Graph")
     ), #end sidebarPanel
@@ -45,7 +49,8 @@ shinyUI(
                  br(),
                  plotlyOutput("histo"),
                  br(),
-                 htmlOutput("freqtable")
+                 conditionalPanel(condition="input.probtable",
+                                  rHandsontableOutput("freqtable"))
         ),
         # things that are supposed to be inside second tab
         tabPanel(title="Find Probabilities",
