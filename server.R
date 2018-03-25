@@ -16,23 +16,22 @@ shinyServer(function(input, output, session){
       hovertext = paste0("<b>Probability:</b> ", pct(ys), "<br>")
     )
     
-    validate(need(input$xrange[1] < input$xrange[2], "Please select a valid range."))
+    #validate(need(input$xrange[1] < input$xrange[2], "Please select a valid range."))
     
-    plot_ly(data = rv$df, x = ~xs, y = ~ys, text = ~hovertext, hoverinfo = "text", type = "bar", source = "source") %>%
-      layout(xaxis = list(range = input$xrange, title = "k"),
-             yaxis = list(range = c(0, .4), title = "P(X=k)"))
+    plot_ly(data = rv$df, x = ~factor(xs), y = ~ys, text = ~hovertext, hoverinfo = "text", type = "bar", source = "source") %>%
+      layout(xaxis = list(range = input$xrange, title = "x"),
+             yaxis = list(range = c(0, .4), title = "P(X=x)"))
   })
   
   output$freqtable <- renderRHandsontable({
     rv$df %>%
       mutate(ys = formatC(ys, format = "f", digits = 3)) %>%
       select(xs, ys) %>%
-      rhandsontable(readOnly = TRUE, height = 230, index=rv$hovered,
-                    colHeaders = c("Number of occurrences", ("Probability")), rowHeaders = FALSE) %>%
+      rhandsontable(readOnly = TRUE, height = 200, index=rv$hovered,
+                    colHeaders = c("x", "P(X=x)"), rowHeaders = FALSE) %>%
       hot_table(stretchH = "all") %>%
       hot_cols(manualColumnResize = TRUE, columnSorting = TRUE, halign = "htCenter",
-               renderer = read_file(file = "../js/highlight.js")) %>%
-      hot_col(1, colWidths = 25)
+               renderer = read_file(file = "js/highlight.js"))
   })
   
   observeEvent(event_data("plotly_hover", source = "source"), {
