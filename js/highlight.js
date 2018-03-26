@@ -5,7 +5,7 @@ function highlight(instance, td, row, col, prop, value, cellProperties) {
     mhrows = instance.params.index;
     mhrows = mhrows instanceof Array ? mhrows : [mhrows];
   }
-  if (instance.params && mhrows.includes(row)) td.style.background = '#1F77B4';
+  if (instance.params && mhrows.includes(row)) td.style.background = '#B2DF8A';
   if (value =='NA') {
     value = '';
     Handsontable.renderers.getRenderer('text')(instance, td, row, col, prop, value, cellProperties);
