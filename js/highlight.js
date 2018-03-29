@@ -1,6 +1,6 @@
 function highlight(instance, td, row, col, prop, value, cellProperties) {
   Handsontable.renderers.TextRenderer.apply(this, arguments);
-  td.style.color = 'black';             
+  td.style.color = 'black';
   if (instance.params) {
     mhrows = instance.params.index;
     mhrows = mhrows instanceof Array ? mhrows : [mhrows];

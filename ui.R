@@ -18,7 +18,7 @@ navbarPage(
         sliderInput("lambda", HTML("<p>Select Rate Parameter &lambda;:</p>"),
                     min = 0, max = 10, value = 4, step = 0.05, round = -2),
         h5(tags$b("Probability Table:")),
-        rHandsontableOutput("freqtable")
+        rHandsontableOutput("freqtable1")
       ), #end sidebar
       mainPanel(
         useShinyjs(),
@@ -41,7 +41,9 @@ navbarPage(
          )
        ),
        mainPanel(
-         plotlyOutput("bar1")
+         plotlyOutput("bar1", height=330),
+         br(),
+         fluidRow(column(1), column(11, tableOutput("probtable")))
        )
     ) #end sidebarlayout
   ) #end second tabPanel
