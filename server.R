@@ -100,7 +100,10 @@ output$bar1 <- renderPlotly({
   )
   df$Prob <- pct(df$ys)
   if(input$type!="type4") x <- req(input$x,cancelOutput = TRUE)
-  else {x1 <- req(input$x1,cancelOutput = TRUE); x2 <- req(input$x2,cancelOutput = TRUE)}
+  else {
+    x1 <- req(input$x1,cancelOutput = TRUE); x2 <- req(input$x2,cancelOutput = TRUE)
+    if(x1>x2) {updateNumericInput(session, "x1", value=min(x1,x2)); updateNumericInput(session, "x2", value=max(x1,x2))}
+  }
   df$selected <- switch(input$type,
     "type1" = {subtitle <- paste0("P(X = ", x, ") = ", pct(dpois(x,lambda))); df$xs == x},
     "type2" = {subtitle <- paste0("P(X ≤ ", x, ") = ", pct(ppois(x,lambda))); df$xs <= x},
@@ -169,48 +172,56 @@ output$freqtable2 <- renderRHandsontable({
 # #add.to.row = list(pos = list(0), command = " <tr> <th> x </th> <th> P(X &le; x) </th> </tr>" ) 
 # )
 
+output$caption1 <- renderUI(HTML("<b> <u> <span style='color:#000000'> Poisson Probability </u> </b>"))
+
 output$probtable1 <- renderTable({
   df <- data.frame(x=input$x, y=dpois(input$x, lambda = input$lambda1))
   return(df)
 }, border=TRUE, striped=FALSE, hover=TRUE, digits=4,
-caption = "<b> <u> <span style='color:#000000'> Probability: </u> </b>",
-caption.placement = getOption("xtable.caption.placement", "top"),
+#caption = "<b> <u> <span style='color:#000000'> Probability: </u> </b>",
+#caption.placement = getOption("xtable.caption.placement", "top"),
 #sanitize.text.function = function(x){x} #for printing math symbols, doesn't seem to work
 ## this works but would need a separate table for each type
 include.colnames=FALSE,
 add.to.row = list(pos = list(0), command = " <tr> <th> x </th> <th> P(X = x) </th> </tr>" ) 
 )
 
+output$caption2 <- renderUI(HTML("<b> <u> <span style='color:#000000'> Cumulative Probability (Lower Tail) </u> </b>"))
+
 output$probtable2 <- renderTable({
   df <- data.frame(x=input$x, y=ppois(input$x, lambda = input$lambda1))
   return(df)
 }, border=TRUE, striped=FALSE, hover=TRUE, digits=4,
-caption = "<b> <u> <span style='color:#000000'> Probability: </u> </b>",
-caption.placement = getOption("xtable.caption.placement", "top"),
+#caption = "<b> <u> <span style='color:#000000'> Probability: </u> </b>",
+#caption.placement = getOption("xtable.caption.placement", "top"),
 #sanitize.text.function = function(x){x} #for printing math symbols, doesn't seem to work
 ## this works but would need a separate table for each type
 include.colnames=FALSE,
 add.to.row = list(pos = list(0), command = " <tr> <th> x </th> <th> P(X &le; x) </th> </tr>" ) 
 )
 
+output$caption3 <- renderUI(HTML("<b> <u> <span style='color:#000000'> Cumulative Probability (Upper Tail) </u> </b>"))
+
 output$probtable3 <- renderTable({
   df <- data.frame(x=input$x, y=1-ppois(input$x-1, lambda = input$lambda1))
   return(df)
 }, border=TRUE, striped=FALSE, hover=TRUE, digits=4,
-caption = "<b> <u> <span style='color:#000000'> Probability: </u> </b>",
-caption.placement = getOption("xtable.caption.placement", "top"),
+#caption = "<b> <u> <span style='color:#000000'> Probability: </u> </b>",
+#caption.placement = getOption("xtable.caption.placement", "top"),
 #sanitize.text.function = function(x){x} #for printing math symbols, doesn't seem to work
 ## this works but would need a separate table for each type
 include.colnames=FALSE,
 add.to.row = list(pos = list(0), command = " <tr> <th> x </th> <th> P(X &ge; x) </th> </tr>" ) 
 )
 
+output$caption4 <- renderUI(HTML("<b> <u> <span style='color:#000000'> Interval Probability: </u> </b>"))
+
 output$probtable4 <- renderTable({
   df <- data.frame(x1=input$x1, x2=input$x2, y=ppois(input$x2,input$lambda1)-ppois(input$x1-1, lambda = input$lambda1))
   return(df)
 }, border=TRUE, striped=FALSE, hover=TRUE, digits=4,
-caption = "<b> <u> <span style='color:#000000'> Probability: </u> </b>",
-caption.placement = getOption("xtable.caption.placement", "top"),
+#caption = "<b> <u> <span style='color:#000000'> Probability: </u> </b>",
+#caption.placement = getOption("xtable.caption.placement", "top"),
 #sanitize.text.function = function(x){x} #for printing math symbols, doesn't seem to work
 ## this works but would need a separate table for each type
 include.colnames=FALSE,
@@ -236,14 +247,11 @@ output$bar2 <- renderPlotly({
     ys = dpois(xs, lambda)
   )
   df$Prob <- pct(df$ys)
-  if(input$qtype=="one") {p <- req(input$p/100,cancelOutput = TRUE); q <- qpois(p, lambda=lambda)}
-  else {p <- req(input$p1/100,cancelOutput = TRUE); q <- qpois(c(p/2,1-p/2), lambda=lambda)}
-  switch(input$qtype,
-    "one" = {subtitle <- paste0("P(X ≤ ", q, ") = ", pct(ppois(q,lambda)), " and P(X ≤ ", q-1, ") = ", pct(ppois(q-1,lambda))); df$selected <- df$xs <= q},
-    "two" = {subtitle <- paste0("P( X ≤ ",q[1],") + P(X ≥ ", q[2],") = ", pct(1-(ppois(q[2],lambda)-ppois(q[1]-1,lambda)))); df$selected <- (df$xs <= q[1]) | (df$xs >= q[2])}
-  )
+  q <- qpois(req(input$p)/100, lambda=lambda) 
+  subtitle <- paste0("P(X ≤ ", q, ") = ", pct(ppois(q,lambda)))
+  df$selected <- df$xs <= q
   if(any(df$selected)) mycol1 <- mycol[c(2,4)] else mycol1=mycol[2] #gray bars and green bars
-  rv$df3 <- df
+  rv$df3 <- df 
   myhovertext <- c(rbind(paste("<b>", c("Number of Events","Probability"), ":</b> ", sep=""),
                          lapply(c("xs","Prob"), sym),
                          c("<br>","<br>")))
@@ -252,7 +260,7 @@ output$bar2 <- renderPlotly({
           text = ~do.call(paste0,myhovertext), hoverinfo = "text+x",
           height = 330) %>%
     add_trace(x=factor(q), y=0, type="scatter", mode="markers", marker=list(color=mycol[1], size=15, line = list(color = '#000000', width = 2)),
-              text=paste0(100*p, "% Quantile: ",q), hoverinfo="text", inherit=FALSE) %>%
+              text=paste0(input$p, "% Quantile: ",q), hoverinfo="text", inherit=FALSE) %>%
     layout(xaxis = list(title = "Number of Events x",ticks="outside"),
            yaxis = list(title = "Probability P(X = x)", rangemode = "tozero"),
            showlegend = FALSE,
@@ -265,15 +273,12 @@ output$bar2 <- renderPlotly({
 })
 
 output$quantable <- renderTable({
-  switch(input$qtype,
-    "one" = {p <- input$p; df <- data.frame(q=qpois(p/100, lambda = input$lambda2))
-      colnames(df) <- paste0(input$p, "% Quantile ")},
-    "two" = {p <- input$p1; df <- data.frame(q1=qpois(p/200, lambda = input$lambda2), q2=qpois(1-p/200, lambda = input$lambda2))
-               colnames(df) <- c(paste0(p/2, "% Quantile "),paste0(100-p/2, "% Quantile "))}
-  )
+  p <- input$p
+  df <- data.frame(q=qpois(p/100, lambda = input$lambda2))
+  colnames(df) <- paste0(input$p, "% Quantile ")
   return(df)
 }, border=TRUE, striped=FALSE, hover=TRUE, digits=0,
-caption = "<b> <u> <span style='color:#000000'> Quantiles: </u> </b>",
+caption = "<b> <u> <span style='color:#000000'> Quantile: </u> </b>",
 caption.placement = getOption("xtable.caption.placement", "top"),
 sanitize.text.function = function(x){x} #for printing math symbols
 ## this works but would need a separate table for each type

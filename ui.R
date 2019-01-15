@@ -56,24 +56,19 @@ navbarPage(
        mainPanel(
          plotlyOutput("bar1", height=330),
          br(),
-         fluidRow(column(1), 
-                  column(11,
-                    conditionalPanel(condition="input.type=='type1'", column(11, tableOutput("probtable1"))),
-                    conditionalPanel(condition="input.type=='type2'", column(11, tableOutput("probtable2"))),
-                    conditionalPanel(condition="input.type=='type3'", column(11, tableOutput("probtable3"))),
-                    conditionalPanel(condition="input.type=='type4'", column(11, tableOutput("probtable4")))
-                 )
-         )
+         conditionalPanel(condition="input.type=='type1'", uiOutput("caption1"), tableOutput("probtable1")),
+         conditionalPanel(condition="input.type=='type2'", uiOutput("caption2"), tableOutput("probtable2")),
+         conditionalPanel(condition="input.type=='type3'", uiOutput("caption3"), tableOutput("probtable3")),
+         conditionalPanel(condition="input.type=='type4'", uiOutput("caption4"), tableOutput("probtable4"))
        )
     ) #end sidebarlayout
   ), #end second tabPanel
   tabPanel("Find Quantiles",
     sidebarLayout(
       sidebarPanel(
-        numericInput("lambda2", HTML("<p>Select Rate Parameter &lambda;:</p>"), value=5, min=0, step=0.5),
-        selectInput("qtype", "Select Type of Quantile:", choices=list("One-tailed"="one","Two-tailed"="two")),
-        conditionalPanel(condition ="input.qtype == 'one'", numericInput("p", "Percent Below:", value=95, min=0, max=100, width="60%")),
-        conditionalPanel(condition ="input.qtype == 'two'", numericInput("p1", "Percent in Both Tails:", value=5, min=0, max=100, width="60%")),
+        numericInput("lambda2", HTML("<p>Select Rate Parameter &lambda;:</p>"), value=5, min=0, step=0.5, width="60%"),
+        numericInput("p", "Guaranteed Percentage in Lower Tail:", value=20, min=0, max=100, width="60%"),
+        helpText(h5("Note: The actual percentage at or below the quantile may be considerably higher, but the value computed is the smallest possible with the guaranteed percentage in the lower tail")),
         tags$hr(),
         awesomeCheckbox("showprob1", "Show Probability Table"),
         conditionalPanel(condition="input.showprob1", 
@@ -86,12 +81,7 @@ navbarPage(
       mainPanel(
         plotlyOutput("bar2", height=330),
         br(),
-        fluidRow(column(1), 
-                 column(11,tableOutput("quantable"))
-                   #conditionalPanel(condition="input.qtype=='one'", column(11, tableOutput("quantable1"))),
-                   #conditionalPanel(condition="input.qtype=='two'", column(11, tableOutput("quantable2")))
-                 #)
-        )
+        tableOutput("quantable")
       )
     ) #end sidebarlayout
   ) #end third tabPanel
