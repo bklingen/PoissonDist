@@ -29,6 +29,7 @@ output$bar <- renderPlotly({
                          lapply(c("xs","Prob"), sym),
                          c("<br>","<br>")))
   updateNumericInput(session, "lambda1", value=input$lambda)
+  updateNumericInput(session, "lambda2", value=input$lambda)
   if(input$type!="type4") updateNumericInput(session, "x", value=floor(input$lambda))
   else {
     updateNumericInput(session, "x1", value=max(0, floor(input$lambda-2)))
@@ -37,12 +38,15 @@ output$bar <- renderPlotly({
   rv$df1 <- df
   plot_ly(data = df, x = ~factor(xs), y = ~ys, type = "bar", source = "plot1",
           marker = list(color=mycol[1], line = list(color = '#000000', width = 1)),
-          text = ~do.call(paste0,myhovertext), hoverinfo = "text+x") %>%
+          text = ~do.call(paste0,myhovertext), hoverinfo = "text+x", height=360) %>%
     layout(xaxis = list(title = "Number of Events", range = c(-0.9,20.9), ticks="outside"),
-           yaxis = list(title = "Probability", range = c(0, .41), showline=FALSE, rangemode='tozero'),
-           title = "The Poisson Distribution",
-           hovermode = 'x'
+           yaxis = list(title = "Probability", range = c(0, .38), showline=FALSE, rangemode='tozero'),
+           #title = "The Poisson Distribution",
+           hovermode = 'x',
+           margin = list(t=50, b=45)
           ) %>%
+    add_annotations(text=paste0("The Poisson Distribution with λ = ", input$lambda), showarrow=FALSE, font=list(size=17), x=0.5, xref='paper', xanchor='top', y=1.16, yref='paper') %>%
+    add_annotations(text=paste0("Mean = ", input$lambda, ", Standard Deviation = ", round(sqrt(input$lambda),3)), font=list(size=13), showarrow=FALSE, x=0.5, xref='paper', xanchor='top', y=1.08, yref='paper') %>%
     config(collaborate = FALSE, displaylogo = FALSE, modeBarButtonsToRemove = list('resetScale2d', 'sendDataToCloud', 'zoom2d', 'zoomIn2d', 'zoomOut2d', 'pan2d', 'select2d', 'lasso2d', 'hoverClosestCartesian', 'hoverCompareCartesian', 'hoverClosestGl2d', 'hoverClosestPie', 'toggleHover', 'resetViews', 'toggleSpikelines'))
 })
 
@@ -50,7 +54,7 @@ output$freqtable1 <- renderRHandsontable({
   rv$df1 %>%
     mutate(ys = formatC(ys, format = "f", digits = 3)) %>%
     select(xs, ys) %>%
-    rhandsontable(readOnly = TRUE, height = 200, index=rv$hovered1,
+    rhandsontable(readOnly = TRUE, height = 160, index=rv$hovered1,
                   colHeaders = c("x", "P(X=x)"), rowHeaders = FALSE) %>%
     hot_table(stretchH = "all") %>%
     hot_cols(manualColumnResize = TRUE, columnSorting = TRUE, halign = "htCenter",
@@ -118,8 +122,8 @@ output$bar1 <- renderPlotly({
            hovermode = 'x',
            margin = list(t=60, b=45)
     ) %>%
-    add_annotations(text="The Poisson Distribution", showarrow=FALSE, font=list(size=17), x=0.5, xref='paper', xanchor='top', y=1.27, yref='paper') %>%
-    add_annotations(text=subtitle, font=list(size=14, color=mycol[3]), showarrow=FALSE, font=list(size=13), x=0.5, xref='paper', xanchor='top', y=1.17, yref='paper') %>%
+    add_annotations(text=paste0("The Poisson Distribution with λ = ", lambda), showarrow=FALSE, font=list(size=17), x=0.5, xref='paper', xanchor='top', y=1.27, yref='paper') %>%
+    add_annotations(text=subtitle, font=list(size=14, color=mycol[3]), showarrow=FALSE, x=0.5, xref='paper', xanchor='top', y=1.17, yref='paper') %>%
     config(collaborate = FALSE, displaylogo = FALSE, modeBarButtonsToRemove = list('resetScale2d', 'sendDataToCloud', 'zoom2d', 'zoomIn2d', 'zoomOut2d', 'pan2d', 'select2d', 'lasso2d', 'hoverClosestCartesian', 'hoverCompareCartesian', 'hoverClosestGl2d', 'hoverClosestPie', 'toggleHover', 'resetViews', 'toggleSpikelines'))
 })
 
@@ -255,7 +259,7 @@ output$bar2 <- renderPlotly({
            hovermode = 'x',
            margin = list(t=60, b=45)
     ) %>%
-    add_annotations(text="The Poisson Distribution", showarrow=FALSE, font=list(size=17), x=0.5, xref='paper', xanchor='top', y=1.27, yref='paper') %>%
+    add_annotations(text=paste0("The Poisson Distribution with λ = ", lambda), showarrow=FALSE, font=list(size=17), x=0.5, xref='paper', xanchor='top', y=1.27, yref='paper') %>%
     add_annotations(text=subtitle, showarrow=FALSE, font=list(size=14, color=mycol[3]), x=0.5, xref='paper', xanchor='top', y=1.17, yref='paper') %>%
     config(collaborate = FALSE, displaylogo = FALSE, modeBarButtonsToRemove = list('resetScale2d', 'sendDataToCloud', 'zoom2d', 'zoomIn2d', 'zoomOut2d', 'pan2d', 'select2d', 'lasso2d', 'hoverClosestCartesian', 'hoverCompareCartesian', 'hoverClosestGl2d', 'hoverClosestPie', 'toggleHover', 'resetViews', 'toggleSpikelines'))
 })

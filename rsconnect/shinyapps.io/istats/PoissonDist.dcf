@@ -1,0 +1,13 @@
+name: PoissonDist
+title: PoissonDist
+username:
+account: istats
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 310849
+bundleId: 1310000
+url: https://istats.shinyapps.io/PoissonDist/
+when: 1523287970.15306
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: PoissonDist.JPG|README.md|js/README.md|www/Logo.JPG

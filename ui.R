@@ -16,10 +16,10 @@ navbarPage(
         helpText("The Poisson distribution specifies the probability of a certain number of 
                  events happening when each event occurs with a constant rate of ",
                  HTML("&lambda;.")),
-        helpText("Change the value of ", HTML("lambda;"), 
+        helpText("Change the value of ", HTML("&lambda;"), 
                  "to see how the shape of the distribution changes. Hover over the bars to find the probability."),
         sliderInput("lambda", HTML("<p>Select Rate Parameter &lambda;:</p>"),
-                    min = 0, max = 10, value = 4, step = 0.05, round = -2),
+                    min = 0, max = 10, value = 2, step = 0.05, round = -2),
         h5(tags$b("Probability Table:")),
         rHandsontableOutput("freqtable1"),
         tags$hr(),
