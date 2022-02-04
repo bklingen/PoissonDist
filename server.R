@@ -30,24 +30,30 @@ output$bar <- renderPlotly({
                          c("<br>","<br>")))
   updateNumericInput(session, "lambda1", value=input$lambda)
   updateNumericInput(session, "lambda2", value=input$lambda)
-  if(input$type!="type4") updateNumericInput(session, "x", value=floor(input$lambda))
-  else {
-    updateNumericInput(session, "x1", value=max(0, floor(input$lambda-2)))
-    updateNumericInput(session, "x2", value=floor(input$lambda+2))
-  }
+  updateSliderInput(session, "lambda3", value=input$lambda)
+  # if(input$type!="type4") updateNumericInput(session, "x", value=floor(input$lambda))
+  # else {
+  #   updateNumericInput(session, "x1", value=max(0, floor(input$lambda-2)))
+  #   updateNumericInput(session, "x2", value=floor(input$lambda+2))
+  # }
   rv$df1 <- df
   plot_ly(data = df, x = ~factor(xs), y = ~ys, type = "bar", source = "plot1",
           marker = list(color=mycol[1], line = list(color = '#000000', width = 1)),
-          text = ~do.call(paste0,myhovertext), hoverinfo = "text+x", height=360) %>%
+          hovertext = ~do.call(paste0,myhovertext), hoverinfo = "text+x") %>%
     layout(xaxis = list(title = "Number of Events", range = c(-0.9,20.9), ticks="outside"),
-           yaxis = list(title = "Probability", range = c(0, .38), showline=FALSE, rangemode='tozero'),
+           yaxis = list(title = "Probability", range = c(0, .52), showline=FALSE, rangemode='tozero'),
            #title = "The Poisson Distribution",
            hovermode = 'x',
            margin = list(t=50, b=45)
           ) %>%
     add_annotations(text=paste0("The Poisson Distribution with λ = ", input$lambda), showarrow=FALSE, font=list(size=17), x=0.5, xref='paper', xanchor='top', y=1.16, yref='paper') %>%
     add_annotations(text=paste0("Mean = ", input$lambda, ", Standard Deviation = ", round(sqrt(input$lambda),3)), font=list(size=13), showarrow=FALSE, x=0.5, xref='paper', xanchor='top', y=1.08, yref='paper') %>%
-    config(collaborate = FALSE, displaylogo = FALSE, modeBarButtonsToRemove = list('resetScale2d', 'sendDataToCloud', 'zoom2d', 'zoomIn2d', 'zoomOut2d', 'pan2d', 'select2d', 'lasso2d', 'hoverClosestCartesian', 'hoverCompareCartesian', 'hoverClosestGl2d', 'hoverClosestPie', 'toggleHover', 'resetViews', 'toggleSpikelines'))
+    config(displaylogo = FALSE, modeBarButtonsToRemove = list('resetScale2d', 'sendDataToCloud', 'zoom2d', 'zoomIn2d', 'zoomOut2d', 'pan2d', 'select2d', 'lasso2d', 'hoverClosestCartesian', 'hoverCompareCartesian', 'hoverClosestGl2d', 'hoverClosestPie', 'toggleHover', 'resetViews', 'toggleSpikelines'))
+  
+    #config(displaylogo = FALSE,
+    #       modeBarButtons = list(list('toImage','autoScale2d', 'resetScale2d'))
+    #      )
+  #modeBarButtonsToRemove = list('resetScale2d', 'sendDataToCloud', 'zoom2d', 'zoomIn2d', 'zoomOut2d', 'pan2d', 'select2d', 'lasso2d', 'hoverClosestCartesian', 'hoverCompareCartesian', 'hoverClosestGl2d', 'hoverClosestPie', 'toggleHover', 'resetViews', 'toggleSpikelines'))
 })
 
 output$freqtable1 <- renderRHandsontable({
@@ -58,7 +64,18 @@ output$freqtable1 <- renderRHandsontable({
                   colHeaders = c("x", "P(X=x)"), rowHeaders = FALSE) %>%
     hot_table(stretchH = "all") %>%
     hot_cols(manualColumnResize = TRUE, columnSorting = TRUE, halign = "htCenter",
-             renderer = read_file(file = "js/highlight.js"))
+             renderer = 
+        "function(instance, td, row, col, prop, value, cellProperties) {
+        Handsontable.renderers.TextRenderer.apply(this, arguments);
+        td.style.color = 'black';
+        if (instance.params) {
+           hrows = instance.params.index
+           hrows = hrows instanceof Array ? hrows : [hrows]
+         }
+         if (instance.params && hrows.includes(row)) td.style.background = '#B2DF8A'
+      }
+   ")
+   #read_file(file = "js/highlight.js"))
 })
 
 observeEvent(event_data("plotly_hover", source = "plot1"), {
@@ -73,7 +90,7 @@ observeEvent(event_data("plotly_hover", source = "plot1"), {
 ############################
 ## Find Probability Panel ##
 ############################
-  
+
 updateSelectizeInput(session, "type",
   choices = Probs,
   options = list(render = I("
@@ -117,8 +134,8 @@ output$bar1 <- renderPlotly({
                          c("<br>","<br>")))
   plot_ly(data = df, x = ~factor(xs), y = ~ys, color=~selected, colors=mycol1, type = "bar", source = "plot2",
           marker = list(line = list(color = '#000000', width = 1)),
-          text = ~do.call(paste0,myhovertext), hoverinfo = "text+x",
-          height = 330) %>%
+          hovertext = ~do.call(paste0,myhovertext), hoverinfo = "text+x"
+          ) %>%
     layout(xaxis = list(title = "Number of Events x",ticks="outside"),
            yaxis = list(title = "Probability P(X = x)"),
            showlegend = FALSE,
@@ -127,7 +144,9 @@ output$bar1 <- renderPlotly({
     ) %>%
     add_annotations(text=paste0("The Poisson Distribution with λ = ", lambda), showarrow=FALSE, font=list(size=17), x=0.5, xref='paper', xanchor='top', y=1.27, yref='paper') %>%
     add_annotations(text=subtitle, font=list(size=14, color=mycol[3]), showarrow=FALSE, x=0.5, xref='paper', xanchor='top', y=1.17, yref='paper') %>%
-    config(collaborate = FALSE, displaylogo = FALSE, modeBarButtonsToRemove = list('resetScale2d', 'sendDataToCloud', 'zoom2d', 'zoomIn2d', 'zoomOut2d', 'pan2d', 'select2d', 'lasso2d', 'hoverClosestCartesian', 'hoverCompareCartesian', 'hoverClosestGl2d', 'hoverClosestPie', 'toggleHover', 'resetViews', 'toggleSpikelines'))
+    config(displaylogo = FALSE,
+           modeBarButtons = list(list('toImage','autoScale2d', 'resetScale2d'))
+    )
 })
 
 output$freqtable2 <- renderRHandsontable({
@@ -137,40 +156,20 @@ output$freqtable2 <- renderRHandsontable({
     rhandsontable(readOnly = TRUE, height = 150, width=180, index=rv$hovered2,
                   colHeaders = c("x", "P(X = x)"), rowHeaders = FALSE) %>%
     hot_table(stretchH = "all") %>%
-    hot_cols(manualColumnResize = TRUE, columnSorting = TRUE, halign = "htCenter",
-             renderer = read_file(file = "js/highlight.js"))
+    hot_cols(manualColumnResize = TRUE, columnSorting = TRUE, halign = "htCenter")
+   #           renderer = 
+   #      "function(instance, td, row, col, prop, value, cellProperties) {
+   #      Handsontable.renderers.TextRenderer.apply(this, arguments);
+   #      td.style.color = 'black';
+   #      if (instance.params) {
+   #         hrows = instance.params.index
+   #         hrows = hrows instanceof Array ? hrows : [hrows]
+   #       }
+   #       if (instance.params && hrows.includes(row)) td.style.background = '#B2DF8A'
+   #    }
+   # ")
 })
 
-# observeEvent(event_data("plotly_hover", source = "plot2"), {
-#   if(!input$showprob) return(NULL)
-#   eventdata <- req(event_data("plotly_hover", source = "plot2"))
-#   pointNumber <- as.numeric(eventdata$x)
-#   #curveNumber <- as.numeric(eventdata$curveNumber)[1]
-#   #req(curveNumber == 0)
-#   rv$hovered2 <- pointNumber
-#   js$focus(id = "freqtable2", hovered = rv$hovered2, last = nrow(rv$df2) - 1)
-# })
-
-# output$probtable <- renderTable({
-#   switch(input$type,
-#     "type1" = {df <- data.frame(x=input$x, y=dpois(input$x, lambda = input$lambda1))
-#                colnames(df) <- c(" x ", "$P(X = x)$")},
-#     "type2" = {df <- data.frame(x=input$x, y=ppois(input$x, lambda = input$lambda1))
-#                colnames(df) <- c(" x ", " $P(X \\le x)$ ")},
-#     "type3" = {df <- data.frame(x=input$x, y=1-ppois(input$x-1, lambda = input$lambda1))
-#                colnames(df) <- c(" x "," P(X ≥ x) ")},
-#     "type4" = {df <- data.frame(x1=input$x1, x2=input$x2, y=1-ppois(input$x-1, lambda = input$lambda1))
-#     colnames(df) <- c(" x<sub>1</sub> ", " x<sub>2</sub> ", " P(x<sub>1</sub> ≤ X ≤ x<sub>1</sub>) ")}
-#   )
-#   return(df)
-# }, border=TRUE, striped=FALSE, hover=TRUE, digits=4,
-# caption = "<b> <u> <span style='color:#000000'> Probability: </u> </b>",
-# caption.placement = getOption("xtable.caption.placement", "top"),
-# sanitize.text.function = function(x){x} #for printing math symbols
-# ## this works but would need a separate table for each type
-# #include.colnames=FALSE,
-# #add.to.row = list(pos = list(0), command = " <tr> <th> x </th> <th> P(X &le; x) </th> </tr>" ) 
-# )
 
 output$caption1 <- renderUI(HTML("<b> <u> <span style='color:#000000'> Poisson Probability </u> </b>"))
 
@@ -183,7 +182,7 @@ output$probtable1 <- renderTable({
 #sanitize.text.function = function(x){x} #for printing math symbols, doesn't seem to work
 ## this works but would need a separate table for each type
 include.colnames=FALSE,
-add.to.row = list(pos = list(0), command = " <tr> <th> x </th> <th> P(X = x) </th> </tr>" ) 
+add.to.row = list(pos = list(0), command = " <tr> <th> x </th> <th> P(X = x) </th> </tr>" )
 )
 
 output$caption2 <- renderUI(HTML("<b> <u> <span style='color:#000000'> Cumulative Probability (Lower Tail) </u> </b>"))
@@ -197,7 +196,7 @@ output$probtable2 <- renderTable({
 #sanitize.text.function = function(x){x} #for printing math symbols, doesn't seem to work
 ## this works but would need a separate table for each type
 include.colnames=FALSE,
-add.to.row = list(pos = list(0), command = " <tr> <th> x </th> <th> P(X &le; x) </th> </tr>" ) 
+add.to.row = list(pos = list(0), command = " <tr> <th> x </th> <th> P(X &le; x) </th> </tr>" )
 )
 
 output$caption3 <- renderUI(HTML("<b> <u> <span style='color:#000000'> Cumulative Probability (Upper Tail) </u> </b>"))
@@ -211,7 +210,7 @@ output$probtable3 <- renderTable({
 #sanitize.text.function = function(x){x} #for printing math symbols, doesn't seem to work
 ## this works but would need a separate table for each type
 include.colnames=FALSE,
-add.to.row = list(pos = list(0), command = " <tr> <th> x </th> <th> P(X &ge; x) </th> </tr>" ) 
+add.to.row = list(pos = list(0), command = " <tr> <th> x </th> <th> P(X &ge; x) </th> </tr>" )
 )
 
 output$caption4 <- renderUI(HTML("<b> <u> <span style='color:#000000'> Interval Probability: </u> </b>"))
@@ -225,77 +224,53 @@ output$probtable4 <- renderTable({
 #sanitize.text.function = function(x){x} #for printing math symbols, doesn't seem to work
 ## this works but would need a separate table for each type
 include.colnames=FALSE,
-add.to.row = list(pos = list(0), command = " <tr> <th> x<sub>1</sub> </th> <th> x<sub>2</sub> </th> <th> P(x<sub>1</sub> &le; X &le; x<sub>2</sub>) </th> </tr>" ) 
+add.to.row = list(pos = list(0), command = " <tr> <th> x<sub>1</sub> </th> <th> x<sub>2</sub> </th> <th> P(x<sub>1</sub> &le; X &le; x<sub>2</sub>) </th> </tr>" )
 )
 
-######################
-## Quantile Tab ######
-######################
 
-output$bar2 <- renderPlotly({
-  lambda <- req(input$lambda2,cancelOutput = TRUE)
-  sd <- sqrt(lambda)
-  if(lambda<10){
-    min <- floor(max(0,lambda-4.5*sd))
-    max <- ceiling(max(10, lambda+4.5*sd))
-  } else{
-    min <- floor(max(0,lambda-3.5*sd))
-    max <- ceiling(max(10, lambda+3.5*sd))
-  }
-  df <- data_frame(
-    xs = min:max,
-    ys = dpois(xs, lambda)
+
+## Formula Tab ##
+##################
+output$pdf <- renderUI({
+  l <- input$lambda3
+  x <- input$x3
+  xs <- 0:20
+  ys <- dpois(xs, l)
+  df <- data.frame(xs, ys)
+  rv$df3 <- df
+  
+  withMathJax(
+    h4(HTML("<u> General Formula for Poisson Probability: </u>")),
+    h4(sprintf("$$P(X = x) = \\frac{\\lambda^x e^{-\\lambda}}{x!}, x=0,1,2\\ldots$$")),
+    br(),
+    h4(sprintf("Here, with $\\lambda=%.2f$ and $x=%i$, we get:", l,x)),
+    h4(sprintf("$$P(X = %i) = \\frac{%.2f^%i e^{-%.2f}}{%i!} = %.04g$$", x, l, x, l, x,  dpois(x,l)))
   )
-  df$Prob <- pct(df$ys)
-  q <- qpois(req(input$p)/100, lambda=lambda) 
-  subtitle <- paste0("P(X ≤ ", q, ") = ", pct(ppois(q,lambda)))
-  df$selected <- df$xs <= q
-  if(any(df$selected)) mycol1 <- mycol[c(2,4)] else mycol1=mycol[2] #gray bars and green bars
-  rv$df3 <- df 
-  myhovertext <- c(rbind(paste("<b>", c("Number of Events","Probability"), ":</b> ", sep=""),
-                         lapply(c("xs","Prob"), sym),
-                         c("<br>","<br>")))
-  plot_ly(data = df, x = ~factor(xs), y = ~ys, color=~selected, colors=mycol1, type = "bar", source = "plot3",
-          marker = list(line = list(color = '#000000', width = 1)),
-          text = ~do.call(paste0,myhovertext), hoverinfo = "text+x",
-          height = 330) %>%
-    add_trace(x=factor(q), y=0, type="scatter", mode="markers", marker=list(color=mycol[1], size=15, line = list(color = '#000000', width = 2)),
-              text=paste0(input$p, "% Quantile: ",q), hoverinfo="text", inherit=FALSE) %>%
-    layout(xaxis = list(title = "Number of Events x",ticks="outside"),
-           yaxis = list(title = "Probability P(X = x)", rangemode = "tozero"),
-           showlegend = FALSE,
-           hovermode = 'x',
-           margin = list(t=60, b=45)
-    ) %>%
-    add_annotations(text=paste0("The Poisson Distribution with λ = ", lambda), showarrow=FALSE, font=list(size=17), x=0.5, xref='paper', xanchor='top', y=1.27, yref='paper') %>%
-    add_annotations(text=subtitle, showarrow=FALSE, font=list(size=14, color=mycol[3]), x=0.5, xref='paper', xanchor='top', y=1.17, yref='paper') %>%
-    config(collaborate = FALSE, displaylogo = FALSE, modeBarButtonsToRemove = list('resetScale2d', 'sendDataToCloud', 'zoom2d', 'zoomIn2d', 'zoomOut2d', 'pan2d', 'select2d', 'lasso2d', 'hoverClosestCartesian', 'hoverCompareCartesian', 'hoverClosestGl2d', 'hoverClosestPie', 'toggleHover', 'resetViews', 'toggleSpikelines'))
 })
-
-output$quantable <- renderTable({
-  p <- input$p
-  df <- data.frame(q=qpois(p/100, lambda = input$lambda2))
-  colnames(df) <- paste0(input$p, "% Quantile ")
-  return(df)
-}, border=TRUE, striped=FALSE, hover=TRUE, digits=0,
-caption = "<b> <u> <span style='color:#000000'> Quantile: </u> </b>",
-caption.placement = getOption("xtable.caption.placement", "top"),
-sanitize.text.function = function(x){x} #for printing math symbols
-## this works but would need a separate table for each type
-#include.colnames=FALSE,
-#add.to.row = list(pos = list(0), command = " <tr> <th> x </th> <th> P(X &le; x) </th> </tr>" )
-)
 
 
 output$freqtable3 <- renderRHandsontable({
-  rv$df3 %>%
-    mutate(ys = formatC(ys, format = "f", digits = 3)) %>%
-    select(xs, ys) %>%
-    rhandsontable(readOnly = TRUE, height = 150, width=180, index=rv$hovered2,
-                  colHeaders = c("x", "P(X = x)"), rowHeaders = FALSE) %>%
+  rv$df3  %>%
+    mutate(cumprob = ppois(xs,input$lambda3), 
+           ys = formatC(ys, format = "f", digits = 3),
+           cumprob = formatC(cumprob, format = "f", digits = 3)
+    ) %>%
+    select(xs, ys, cumprob) %>%
+    rhandsontable(readOnly = TRUE, height = 180, width=350, index=input$x3,
+                  colHeaders = c("x", "P(X = x)", "P(X <= x)"), rowHeaders = FALSE) %>%
     hot_table(stretchH = "all") %>%
     hot_cols(manualColumnResize = TRUE, columnSorting = TRUE, halign = "htCenter",
-             renderer = read_file(file = "js/highlight.js"))
+             renderer = 
+               "function(instance, td, row, col, prop, value, cellProperties) {
+        Handsontable.renderers.TextRenderer.apply(this, arguments);
+        td.style.color = 'black';
+        if (instance.params) {
+           hrows = instance.params.index
+           hrows = hrows instanceof Array ? hrows : [hrows]
+         }
+         if (instance.params && hrows.includes(row)) td.style.background = '#B2DF8A'
+      }
+   ")
 })
 
 

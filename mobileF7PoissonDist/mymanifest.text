@@ -1,0 +1,30 @@
+create_manifest(
+  path = 'C:/ShinyGit/BinomialDist/mobileBinomialDist',
+  name = "Binomial Distribution",
+  shortName = "BinDist",
+  description = "Binomial Exploration",
+  lang = "en-US",
+  startUrl = "https://istats.shinyapps.io/mobileBinomialDist",
+  display = "standalone",
+  background_color = "#3367D6",
+  theme_color = "#3367D6",
+  icon = data.frame(
+    src = "icons/128x128.png",
+    sizes = "128x128", 10,
+    types = "image/png"
+  )
+)
+
+NER Version
+
+create_manifest(
+  path = 'C:/ShinyGit/BinomialDist/mobileBinomialDist',
+  name = "Binomial Distribution",
+  shortName = "BinDist",
+  description = "Binomial Exploration",
+  lang = "en-US",
+  startUrl = "https://istats.shinyapps.io/mobileBinomialDist",
+  display = c("minimal-ui", "standalone", "fullscreen", "browser"),
+  background_color = "#ffffff",
+  theme_color = "#ffffff"
+)

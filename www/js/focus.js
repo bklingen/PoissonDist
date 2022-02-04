@@ -26,11 +26,13 @@ shinyjs.focus = function(params) {
   // Rhandsontable select cells in a way that either puts the cell of interest
   // at the top or at the bottom, depending on the direction moved. To make the
   // focusing more consistent, we first go to the last row.
-  table.selectCell(params.last, 1);
+  // table.selectCell(params.last, 1);
   
   // Finally, move 2 rows above the row of interest, unless the row of interest
   // is one of the first two.
   params.hovered = params.hovered < 2 ? 2 : params.hovered;
-  table.selectCell(params.hovered-2, 1);
-  table.deselectCell();
+  // table.selectCell(params.hovered-2, 1);
+  // table.deselectCell();
+  // Modified Jan 14 2021 to use this new command
+  table.scrollViewportTo(params.hovered - 2);
 };

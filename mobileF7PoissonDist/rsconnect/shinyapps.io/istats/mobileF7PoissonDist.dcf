@@ -1,0 +1,13 @@
+name: mobileF7PoissonDist
+title:
+username:
+account: istats
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 3926215
+bundleId: 4558464
+url: https://istats.shinyapps.io/mobileF7PoissonDist/
+when: 1620185066.67756
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: apexbarchart.R|mymanifest.text
