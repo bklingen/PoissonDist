@@ -15,7 +15,13 @@ pct <- function(x, digits = 2, format = "f", ...) {
 }
 
 shinyServer(function(input, output, session){
-  
+
+## Start-up promo for the Art of Stat mobile app. Art of Stat only; the modal lives in artofstat_modal.R.
+if (!lumen) {
+  source("artofstat_modal.R", local = TRUE)
+  observe(show_artofstat_modal())
+}
+
 rv <- reactiveValues(df1 = NULL, hovered1 = NULL, df2 = NULL, hovered2 = NULL, df3 = NULL, hovered3 = NULL)
 
 output$bar <- renderPlotly({

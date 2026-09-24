@@ -6,8 +6,110 @@ library(shinyWidgets)
 library(DT)
 
 #  (C) 2020  Bernhard Klingenberg
+## `lumen` is set in global.R: TRUE for the Lumen Learning app, FALSE for Art of Stat.
+
+store_badges <- if (!lumen) {
+  div(class="column2",
+      a(img(src="badge-app-store.svg", class="sidebar-badge", alt="Download on the App Store"),
+        href='https://apps.apple.com/us/app/art-of-stat/id6755374228',
+        target="_blank",
+        `aria-label` = "Download the Art of Stat app on the App Store (opens in a new tab)"),
+      a(img(src="badge-google-play.svg", class="sidebar-badge", alt="Get it on Google Play"),
+        href='https://play.google.com/store/apps/details?id=com.artofstat.app',
+        target="_blank",
+        `aria-label` = "Get the Art of Stat app on Google Play (opens in a new tab)")
+  )
+}
+
+textbook_promo <- if (!lumen) {
+  tagList(
+    h5(tags$b("Check out our textbook:")),
+    a(img(src='textbookFullCover.png', width="150px", alt="Cover image of the Art of Stat textbook"),
+      href='http://www.artofstat.com',
+      target="_blank",
+      `aria-label` = "Art of Stat textbook website (opens in a new tab)")
+  )
+}
+
+artofstat_icon <- a(
+  img(
+    src = "app-artofstat.png",
+    width = "85px",
+    class = "sidebar-icon",
+    alt = "Art of Stat mobile app icon"
+  ),
+  href = "https://artofstat.com/mobile-apps",
+  target = "_blank",
+  `aria-label` = "Art of Stat mobile app (opens in a new tab)"
+)
+
+## Sidebar footer shared by all tabs: mobile app, and (Art of Stat only) store badges and textbook
+sidebar_promo <- tagList(
+  tags$hr(class = "custom-hr"),
+  h5(tags$b("Available as mobile app:")),
+  div(class="sidebar-apps",
+      div(class="column1",
+          artofstat_icon
+      ),
+      store_badges
+  ),
+  tags$p(
+    "More information ",
+    tags$a(href = "https://artofstat.com/mobile-apps", "here.", target="_blank",
+           `aria-label` = "More information about the Art of Stat mobile app (opens in a new tab)")
+  ),
+  textbook_promo
+)
+
 navbarPage(
-  title=a(tags$b("The Poisson Distribution"), href='http://www.artofstat.com'),
+  title = if (lumen) {
+    HTML("<b style='color:black;'>The Poisson Distribution</b>")
+  } else {
+    a(tags$b("The Poisson Distribution"), href='http://www.artofstat.com')
+  },
+  header = tags$head(
+    tags$style(HTML("
+      .custom-hr {
+        border: 0;
+        border-top: 1px solid #808080;
+        margin: 15px 0;
+      }
+      .sidebar-icon {
+        border-radius: 22px;
+      }
+      .sidebar-apps {
+        display: flex;
+        align-items: center;
+      }
+      .column1 {
+        width: 100px;
+        padding: 2px;
+      }
+      .column1 a {
+        display: block;
+        line-height: 0;
+      }
+      .column2 {
+        width: 160px;
+        padding: 2px;
+      }
+      .column2 a {
+        display: block;
+        height: 36px;
+        line-height: 0;
+      }
+      .column2 a + a {
+        height: 34px;
+        margin-top: 4px;
+      }
+      .sidebar-badge {
+        height: 100%;
+        width: auto;
+        max-width: none;
+        display: block;
+      }
+      "))
+  ),
   windowTitle="Poisson Distribution",
   id="mytabs",
   tabPanel("Explore",
@@ -22,35 +124,9 @@ navbarPage(
                     min = 0, max = 10, value = 2, step = 0.05, round = -2),
         h5(tags$b("Probability Table:")),
         rHandsontableOutput("freqtable1"),
-        tags$hr(),
-        a(img(src="Logo.PNG"), href='http://www.artofstat.com')
+        sidebar_promo
       ), #end sidebar
       mainPanel(
-        modalDialog(
-          #HTML("<img src='Icon4_512_512.png'/>"),
-          title = HTML("
-        <h4>Work with the Binomial Distribution right on your phone with the new Art of Stat: Distributions <b> mobile app</b>!</h3>
-        "),
-          a(img(src="DistAppIconRound.png", width="230"), href='https://artofstat.com/mobile-apps'),
-          a(img(src="IMG_5565.PNG", width="130"), href='https://artofstat.com/mobile-apps'),
-          a(img(src="IMG_5566.PNG", width="130"), href='https://artofstat.com/mobile-apps'),
-          #a(img(src="IMG_5357.PNG", width="130"), href='https://artofstat.com/mobile-apps'),
-          tags$br(),
-          #a(img(src="AppStoreLogoApple.png",width="180"), href='https://apps.apple.com/us/app/art-of-stat-explore-data/id1599474757#?platform=iphone'),
-          a(img(src="AppStoreLogoApple.png",width="180"), href=' https://apps.apple.com/gb/app/art-of-stat-inference/id1578438712#?platform=iphone'),
-          a(img(src="AppStoreLogoAndroid1.png",width="205"), href='https://play.google.com/store/apps/details?id=com.artofstat.inference'),
-          footer = tagList(
-            #a(img(src="AppStoreLogoApple.png",width="210"), href='http://www.artofstat.com'),
-            #a(img(src="AppStoreLogoAndroid1.png",width="235"), href='http://www.artofstat.com'),
-            HTML("<big>Search for <b>Art of Stat</b> in the App Store.<br>For more information, including screenshots, <a href=https://artofstat.com/mobile-apps>check here</a>.</big> <br>"),
-            modalButton("Dismiss")
-            #actionButton("ok", "OK")
-          ),
-          #footer = modalButton("Dismiss"),
-          size = "m", #c("m", "s", "l"),
-          easyClose = TRUE,
-          fade = TRUE
-        ),
         useShinyjs(),
         extendShinyjs(script = "js/focus.js", functions=c("focus")),
         plotlyOutput("bar", height=380)
@@ -75,8 +151,7 @@ navbarPage(
            h5(tags$b("Probability Table:")),
            rHandsontableOutput("freqtable2")
          ),
-         tags$hr(),
-         a(img(src="Logo.PNG"), href='http://www.artofstat.com')
+         sidebar_promo
        ),
        mainPanel(
          plotlyOutput("bar1", height=330),
@@ -98,8 +173,7 @@ navbarPage(
                sliderInput("lambda3", HTML("<p>Rate Parameter &lambda;:</p>"), min = 0, max = 10, value = 2, step = 0.05, round = -2),
                sliderInput(inputId = "x3", label=HTML("<p>Number of Events (x):</p>"), min=0, value=3, max=20, step=1),
                helpText(HTML("For calculations with values of &lambda; or x not selectable via the sliders, please go to the <b>Find Probability</b> tab, where you can enter any values for &lambda; and x.")),
-               tags$hr(),
-               a(img(src="Logo.PNG"), href='http://www.artofstat.com')
+               sidebar_promo
              ),
              mainPanel(
                uiOutput('pdf'),
