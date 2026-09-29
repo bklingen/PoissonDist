@@ -15,13 +15,25 @@ shinyjs.focus = function(params) {
   // Select the first "div" element with "rhandsontable" class and the given id
   // on the page.
   var selector = "div.rhandsontable" + "#" + params.id;
+
   var td = document.querySelector(selector);
   
   // Get the widget instance of the DOM element, which is a JavaScript object.
   var widget = HTMLWidgets.getInstance(td);
+  if (!widget) {
+    console.error("Widget instance not found.");
+    console.log("Selector:", selector);
+    return;
+  }
   
   // Access the field that contains the data about our table.
   var table = widget.hot;
+  if (!table) {
+    console.error("Handsontable instance not found.");
+    console.log("Selector:", selector);
+    console.log("Widget:", widget);
+    return;
+  }
   
   // Rhandsontable select cells in a way that either puts the cell of interest
   // at the top or at the bottom, depending on the direction moved. To make the

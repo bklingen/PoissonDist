@@ -1,9 +1,9 @@
+library(shiny)
 library(plotly)
 library(rhandsontable)
 library(shinyjs)
 library(V8)
 library(shinyWidgets)
-library(DT)
 
 #  (C) 2020  Bernhard Klingenberg
 ## `lumen` is set in global.R: TRUE for the Lumen Learning app, FALSE for Art of Stat.
@@ -68,6 +68,8 @@ navbarPage(
     a(tags$b("The Poisson Distribution"), href='http://www.artofstat.com')
   },
   header = tags$head(
+    ## Google Analytics tag: defined only in the Art of Stat apps' global.R, so the Lumen apps have none
+    if (!lumen && exists("ga_tag")) ga_tag,
     tags$style(HTML("
       .custom-hr {
         border: 0;
@@ -145,7 +147,6 @@ navbarPage(
              column(6, numericInput("x2", HTML("Value of x<sub>2</sub>:"), value=5, min=0))
            )
          ),
-         tags$hr(),
          awesomeCheckbox("showprob", "Show Probability Table"),
          conditionalPanel(condition="input.showprob",
            h5(tags$b("Probability Table:")),
@@ -163,6 +164,46 @@ navbarPage(
        )
     ) #end sidebarlayout
   ), #end second tabPanel
+  tabPanel("Simulate Numbers",
+    sidebarLayout(
+      sidebarPanel(
+        numericInput("lambda4", HTML("<p>Rate Parameter &lambda;:</p>"), value=2, min=0, step=0.5),
+        numericInput("nsims", "Number to Simulate:", min = 1, max = 10000, value = 30, step = 10),
+        fluidRow(
+          column(6, actionButton("simulate", "Simulate", class = "btn-primary", width = "100%")),
+          column(6, actionButton("simReset", "Reset", width = "100%",
+                                 style = "background-color: #CD853F; border-color: #CD853F; color: white;"))
+        ),
+        br(),
+        helpText("Each click on Simulate draws new random numbers from the Poisson distribution and adds a row to the Descriptive Statistics table."),
+        sidebar_promo
+      ), #end simulate sidebarpanel
+      mainPanel(
+        plotlyOutput("simbar", height=380),
+        br(),
+        uiOutput("simNumbersTitle"),
+        uiOutput("simNumbers"),
+        downloadButton("simDownload", "Download Simulated Numbers", style = "font-size: 12px; padding: 2px 10px; margin-top: 6px;"),
+        br(), br(),
+        ## scroll boxes showing the column headers and 15 rows; the headers stay visible while scrolling
+        tags$style(HTML("
+          .sim-scroll { max-height: 505px; overflow-y: auto; display: inline-block; margin-bottom: 0; }
+          .sim-scroll table { margin-bottom: 0; }
+          .sim-scroll thead th { position: sticky; top: 0; background-color: white; z-index: 1; }
+        ")),
+        ## the two tables side by side (they wrap below each other on narrow screens)
+        div(style = "display: flex; flex-wrap: wrap; gap: 20px 120px; align-items: flex-start;",
+            div(HTML("<b> <u> <span style='color:#000000'> Frequency Table of Simulated Numbers: </span> </u> </b>"),
+                br(),
+                div(class = "sim-scroll", tableOutput("simFreq"))),
+            div(HTML("<b> <u> <span style='color:#000000'> Descriptive Statistics: </span> </u> </b>"),
+                br(),
+                div(class = "sim-scroll", tableOutput("simStats")))
+        ),
+        br()
+      )
+    ) #end sidebarlayout
+  ), #end Simulate Numbers tabPanel
   tabPanel("Formulas and Properties",
            sidebarLayout(
              sidebarPanel(
@@ -172,12 +213,11 @@ navbarPage(
                #helpText(h5("The cumulative distribution function $P(X \\le x)$ gives the probability of observing $x$ events or fewer.")),
                sliderInput("lambda3", HTML("<p>Rate Parameter &lambda;:</p>"), min = 0, max = 10, value = 2, step = 0.05, round = -2),
                sliderInput(inputId = "x3", label=HTML("<p>Number of Events (x):</p>"), min=0, value=3, max=20, step=1),
-               helpText(HTML("For calculations with values of &lambda; or x not selectable via the sliders, please go to the <b>Find Probability</b> tab, where you can enter any values for &lambda; and x.")),
+               helpText(HTML("For calculations with values of &lambda; or x not selectable via the sliders, please go to the <b>Find Probabilities</b> tab, where you can enter any values for &lambda; and x.")),
                sidebar_promo
              ),
              mainPanel(
                uiOutput('pdf'),
-               uiOutput('cdf'),
                h5(tags$b("Probability Table:")),
                rHandsontableOutput("freqtable3")
              )
