@@ -15,6 +15,42 @@ pct <- function(x, digits = 2, format = "f", ...) {
   paste0(formatC(100 * x, format = format, digits = digits, ...), "%")
 }
 
+pRound <- function(x, displayProp=FALSE) {
+  ##in: x .. a number >= 0 
+  ## returns rounded probability as a percentage or, with displayProp option, as proportion plus percent: "0.973 (or 97.3%)"
+  if(any(is.na(x)) | any(!is.finite(x))) return(NA)
+  
+  if (x >= 1) {
+    myDigits <- 2
+  } else if (x >= 0.1) {
+    myDigits <- 3
+  } else if (x >= 0.01) {
+    myDigits <- 4
+  } else {
+    myDigits <- 2 - floor(log10(abs(x)))
+    if(!is.finite(myDigits)) myDigits <- 2
+  }
+  
+  # format() allows at most 20 decimals; smaller values are shown in scientific notation
+  if (myDigits > 20) {
+    percentText <- format(signif(x, 3), scientific = TRUE)
+  } else {
+    percentText <- format(round(x, myDigits), nsmall=myDigits, scientific = FALSE)
+  }
+  
+  if (displayProp){
+    propDigits <- myDigits + 2
+    if (propDigits > 20) {
+      propText <- format(signif(x/100, 3), scientific = TRUE)
+    } else {
+      propText <- format(round(x/100, propDigits), nsmall=propDigits, scientific = FALSE)
+    }
+    return(paste0(propText, " (or ", percentText, "%)"))
+  }
+  
+  return(paste0(percentText, "%"))
+}
+
 ## a number as entered, without trailing zeros (0.125, not 0.13 or 0.1250)
 num <- function(v) format(signif(v, 10), scientific = FALSE, trim = TRUE, drop0trailing = TRUE)
 
@@ -116,7 +152,7 @@ output$bar <- renderPlotly({
 
 output$freqtable1 <- renderRHandsontable({
   req(rv$df1) %>%
-    mutate(ys = formatC(ys, format = "f", digits = 3)) %>%
+    mutate(ys = formatC(ys, format = "f", digits = 4)) %>%
     select(xs, ys) %>%
     rhandsontable(readOnly = TRUE, height = 160, index=rv$hovered1,
                   colHeaders = c("x", "P(X=x)"), rowHeaders = FALSE) %>%
@@ -202,7 +238,7 @@ output$bar1 <- renderPlotly({
 output$freqtable2 <- renderRHandsontable({
   checkLambda(req(input$lambda1))
   req(rv$df2) %>%
-    mutate(ys = formatC(ys, format = "f", digits = 3)) %>%
+    mutate(ys = formatC(ys, format = "f", digits = 4)) %>%
     select(xs, ys) %>%
     rhandsontable(readOnly = TRUE, height = 150, width=180, index=rv$hovered2,
                   colHeaders = c("x", "P(X = x)"), rowHeaders = FALSE) %>%
@@ -224,13 +260,13 @@ probTable <- function(type) {
   if(type != "type4") {
     x <- req(input$x)
     pp <- poisProb(type, lambda, x = x)
-    df <- data.frame(lambda = num(lambda), x = num(x), y = pct(pp$prob))
-    colnames(df) <- c("&lambda;", "Value of x", paste0("Probability<br>", htmlSigns(pp$label)))
+    df <- data.frame(lambda = num(lambda), x = num(x), y = pRound(100*pp$prob, displayProp = !lumen))
+    colnames(df) <- c("&lambda;", "Value of x", paste0("Probability", if (lumen) "<br>" else " ", htmlSigns(pp$label)))
   } else {
     x1 <- req(input$x1); x2 <- req(input$x2)
     pp <- poisProb("type4", lambda, x1 = x1, x2 = x2)
-    df <- data.frame(lambda = num(lambda), x1 = num(x1), x2 = num(x2), y = pct(pp$prob))
-    colnames(df) <- c("&lambda;", "Value of x<sub>1</sub>", "Value of x<sub>2</sub>", paste0("Probability<br>", htmlSigns(pp$label)))
+    df <- data.frame(lambda = num(lambda), x1 = num(x1), x2 = num(x2), y = pRound(100*pp$prob, displayProp = !lumen))
+    colnames(df) <- c("&lambda;", "Value of x<sub>1</sub>", "Value of x<sub>2</sub>", paste0("Probability", if (lumen) "<br>" else " ", htmlSigns(pp$label)))
   }
   df
 }
