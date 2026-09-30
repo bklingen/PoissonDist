@@ -5,9 +5,8 @@ account: istats
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 310849
-bundleId: 1310000
+bundleId: 12623382
 url: https://istats.shinyapps.io/PoissonDist/
-when: 1523287970.15306
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: PoissonDist.JPG|README.md|js/README.md|www/Logo.JPG
+ignoredFiles: mobileF7PoissonDist/apexbarchart.R|mobileF7PoissonDist/global.R|mobileF7PoissonDist/mymanifest.text|mobileF7PoissonDist/server.R|mobileF7PoissonDist/ui.R|PoissonDist.JPG|README.md
