@@ -76,6 +76,27 @@ navbarPage(
           background-color: #e3e3e3;
           border: 1px solid #c0c0c0;
         }
+        /* Top bar in the same gray as the sidebar; darker tab text and title for contrast (WCAG AA) */
+        .navbar.navbar-default {
+          background-color: #e3e3e3 !important;
+          border-color: #c0c0c0;
+          border-bottom: 1px solid #c0c0c0;
+        }
+        .navbar-default .navbar-brand, .navbar-default .navbar-brand a {
+          color: #23527c;
+        }
+        .navbar-default .navbar-nav > li > a {
+          color: #333333;
+        }
+        .navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus {
+          background-color: #d9d9d9;
+          color: #000000;
+        }
+        .navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:hover,
+        .navbar-default .navbar-nav > .active > a:focus, .navbar-default .navbar-nav > li > a.active {
+          background-color: #cccccc;
+          color: #000000;
+        }
       .custom-hr {
         border: 0;
         border-top: 1px solid #808080;
