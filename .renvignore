@@ -1,0 +1,2 @@
+# Files renv ignores when finding the packages this app needs (old or experimental code, not part of the app)
+/mobileF7PoissonDist/
