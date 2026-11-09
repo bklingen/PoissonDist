@@ -71,6 +71,11 @@ navbarPage(
     ## Google Analytics tag: defined only in the Art of Stat apps' global.R, so the Lumen apps have none
     if (!lumen && exists("ga_tag")) ga_tag,
     tags$style(HTML("
+        /* Sidebar gray, darker than the Bootstrap default #f5f5f5 */
+        .well {
+          background-color: #e3e3e3;
+          border: 1px solid #c0c0c0;
+        }
       .custom-hr {
         border: 0;
         border-top: 1px solid #808080;
