@@ -73,12 +73,12 @@ navbarPage(
     tags$style(HTML("
         /* Sidebar gray, darker than the Bootstrap default #f5f5f5 */
         .well {
-          background-color: #ebebeb;
+          background-color: #f0f0f0;
           border: 1px solid #c8c8c8;
         }
         /* Top bar in the same gray as the sidebar; darker tab text and title for contrast (WCAG AA) */
         .navbar.navbar-default {
-          background-color: #ebebeb !important;
+          background-color: #f0f0f0 !important;
           border-color: #c8c8c8;
           border-bottom: 1px solid #c8c8c8;
         }
