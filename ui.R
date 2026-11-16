@@ -73,14 +73,14 @@ navbarPage(
     tags$style(HTML("
         /* Sidebar gray, darker than the Bootstrap default #f5f5f5 */
         .well {
-          background-color: #e3e3e3;
-          border: 1px solid #c0c0c0;
+          background-color: #ebebeb;
+          border: 1px solid #c8c8c8;
         }
         /* Top bar in the same gray as the sidebar; darker tab text and title for contrast (WCAG AA) */
         .navbar.navbar-default {
-          background-color: #e3e3e3 !important;
-          border-color: #c0c0c0;
-          border-bottom: 1px solid #c0c0c0;
+          background-color: #ebebeb !important;
+          border-color: #c8c8c8;
+          border-bottom: 1px solid #c8c8c8;
         }
         .navbar-default .navbar-brand, .navbar-default .navbar-brand a {
           color: #23527c;
